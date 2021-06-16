@@ -35,11 +35,20 @@ double long ieee754_to_double(char bin[], int size) {
 			 mantissa_raw[i - 8] = bin[i + 1];
 		 }
 	}
-	return ((double long)1 + bin_to_point(mantissa_raw, 23)) * (1 << (bin_to_int(exp_raw, 8) - bias));
+    int exponent = bin_to_int(exp_raw, 8) - bias;
+    double long mantissa = bin_to_point(mantissa_raw, 23) + 1;
+    double long base;
+    if (exponent < 0) {
+        base = (double long) mantissa * (1 / (1 << exponent));
+    }
+    printf("%Lf\n", base);
+	double long result = ((double long)1 + bin_to_point(mantissa_raw, 23)) * (1 << (bin_to_int(exp_raw, 8) - bias));
+    // printf("%Lf\n", result);
+    return result;
 
 }
 
 int main() {
-	ieee754_to_double("01000000011010100011110101110001", 32);
+	ieee754_to_double("00111111100110011001100110011010", 32);
 	return 1;
 }
