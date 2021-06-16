@@ -17,7 +17,7 @@ double long bin_to_point(char bin[], int size) {
 	int i;
 	for (i = 0; i < size; i++) {
 		if (bin[i] == '1') {
-			point += (double long) 1 / (double) ((int) (1 << i+1));
+			point += 1 / (double) ((int) (1 << i+1));
 		}
 	}
 	return point;
@@ -36,19 +36,34 @@ double long ieee754_to_double(char bin[], int size) {
 		 }
 	}
     int exponent = bin_to_int(exp_raw, 8) - bias;
-    double long mantissa = bin_to_point(mantissa_raw, 23) + 1;
-    double long base;
-    if (exponent < 0) {
-        base = (double long) mantissa * (1 / (1 << exponent));
-    }
-    printf("%Lf\n", base);
-	double long result = ((double long)1 + bin_to_point(mantissa_raw, 23)) * (1 << (bin_to_int(exp_raw, 8) - bias));
-    // printf("%Lf\n", result);
-    return result;
+	printf("Exponent: %d\n", exponent);
+    double mantissa = bin_to_point(mantissa_raw, 23) + 1;
+	printf("Mantissa: %f\n", mantissa);
+	double result;
+    if (exponent < 0) { // handle negative exponent
+        result = mantissa * ((double)1 / (double) (1 << abs(exponent)));
+    } else {
+		result = mantissa * (1 << exponent);
+	}
+	printf("Decimal: %f", result);
+	return sign == 0 ? result : -result;
 
 }
 
 int main() {
-	ieee754_to_double("00111111100110011001100110011010", 32);
-	return 1;
+	ieee754_to_double("01111110111111010110011011111101", 32);
+	ieee754_to_double("01101010111111101010001011111110", 32);
+	ieee754_to_double("10101011111111101111101111111110", 32);
+	ieee754_to_double("00000101111111110101100111111111", 32);
+	// unsigned char buffer[32];
+	// FILE * fp = fopen("amp-A-000.dat", "r");
+	// if (fp == NULL) {
+	// 	printf("File not found.");
+	// 	return 0;
+	// }
+	// fread(buffer, sizeof(buffer), 1, fp);
+	// for (int i = 0; i < 32; i++) {
+	// 	printf("%X", buffer[i]);
+	// }
+	// return 1;
 }
